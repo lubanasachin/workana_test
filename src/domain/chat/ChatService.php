@@ -47,7 +47,8 @@ class ChatService {
         $this->redisHost = getenv('REDIS_HOST');
         $this->redisPort = getenv('REDIS_PORT');
         $this->allowedDomains = explode(',', getenv('ALLOWED_DOMAINS'));
-        $this->allowBlankReferrer = getenv('ALLOW_BLANK_REFERRER') || false;
+        $this->allowBlankReferrer = getenv('ALLOW_BLANK_REFERRER');
+
         if(empty($this->redisHost) || empty($this->redisPort) || empty($this->allowedDomains) || !is_array($this->allowedDomains)) {
             Response::sendResponse(true, 500, 'Server error, invalid configuration.');
         }
@@ -59,7 +60,7 @@ class ChatService {
     */    
     private function checkOrigin() {
         $httpOrigin = !empty($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : null;
-        if($this->allowBlankReferrer || in_array($httpOrigin, $this->allowedDomains)) {
+        if($this->allowBlankReferrer == 'true' || in_array($httpOrigin, $this->allowedDomains)) {
             header('Access-Control-Allow-Credentials: true');
             if($httpOrigin) header("Access-Control-Allow-Origin: $httpOrigin");
         } else Response::sendResponse(true, 403, 'Not a valid origin.');              
